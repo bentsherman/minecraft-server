@@ -1,0 +1,14 @@
+{
+  "name": "minecraft-server",
+  "repository": "bentsherman/minecraft-server",
+  "scripts": {
+    "start": "pm2 startOrReload app.json",
+    "logs": "pm2 logs minecraft-server",
+    "stop": "pm2 stop minecraft-server"
+  },
+  "author": "Ben Shealy",
+  "license": "ISC",
+  "dependencies": {
+    "pm2": "^2.4.0"
+  }
+}

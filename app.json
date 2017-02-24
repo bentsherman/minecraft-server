@@ -1,0 +1,9 @@
+{
+  "apps": [{
+    "name": "minecraft-server",
+    "script": "minecraft_server.jar",
+    "args": "nogui",
+    "interpreter": "java",
+    "interpreter_args": "-Xmx1024M -Xms1024M -jar"
+  }]
+}
