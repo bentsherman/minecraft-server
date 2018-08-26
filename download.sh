@@ -7,11 +7,8 @@ if [ -z $VERSION ]; then
     VERSION="1.7.10"
 fi
 
+URL="https://s3.amazonaws.com/Minecraft.Download/versions/$VERSION/minecraft_server.$VERSION.jar"
 FILENAME="minecraft_server.jar"
 
-if [ -f $FILENAME ]; then
-    echo "error: $FILENAME already exists"
-    exit 1
-fi
-
-wget -O $FILENAME https://s3.amazonaws.com/Minecraft.Download/versions/$VERSION/minecraft_server.$VERSION.jar
+rm -f $FILENAME
+wget -O $FILENAME $URL
