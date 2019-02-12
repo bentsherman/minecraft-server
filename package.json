@@ -4,7 +4,8 @@
   "scripts": {
     "start": "pm2 startOrReload app.json",
     "logs": "pm2 logs minecraft-server",
-    "stop": "pm2 stop minecraft-server"
+    "stop": "pm2 stop minecraft-server",
+    "serve-dev": "http-server docs"
   },
   "author": "Ben Shealy",
   "license": "ISC",

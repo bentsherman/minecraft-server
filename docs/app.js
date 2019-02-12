@@ -116,7 +116,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 				break;
 			}
 			else {
-				await sleep(3000);
+				await sleep(2000);
 			}
 		}
 
@@ -143,7 +143,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 				break;
 			}
 			else {
-				await sleep(1000);
+				await sleep(2000);
 			}
 		}
 
@@ -161,8 +161,13 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 			if ( status === "completed" ) {
 				break;
 			}
+			else if ( status === "errored" ) {
+				$scope.status = "Error: snapshot failed";
+				$scope.$digest();
+				return;
+			}
 			else {
-				await sleep(3000);
+				await sleep(2000);
 			}
 		}
 
@@ -172,10 +177,18 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 		let promise1 = api.Droplet.delete(droplet.id);
 		let promise2 = api.Snapshot.delete(droplet.image.id);
 
-		await promise1;
-		await promise2;
+		try {
+			await promise1;
+			await promise2;
 
-		$scope.status = "Stopped";
-		$scope.$digest();
+			$scope.status = "Stopped";
+			$scope.$digest();
+		}
+		catch ( err ) {
+			$scope.status = "Error: cleanup failed";
+			$scope.$digest();
+
+			console.log(err);
+		}
 	};
 }]);
