@@ -7,9 +7,14 @@ app.config(["$compileProvider", function($compileProvider) {
 }]);
 
 app.service("api", ["$http", "$q", function($http, $q) {
+	var self = this;
+
 	var httpRequest = function(method, url, params, data) {
 		return $http({
 			method: method,
+			headers: {
+				"Authorization": "Bearer " + self.api_key
+			},
 			url: "https://api.digitalocean.com" + url,
 			params: params,
 			data: data
@@ -18,6 +23,10 @@ app.service("api", ["$http", "$q", function($http, $q) {
 		}, function(res) {
 			return $q.reject(res.data);
 		});
+	};
+
+	this.authenticate = function(api_key) {
+		self.api_key = api_key;
 	};
 
 	this.Droplet = {};
@@ -31,7 +40,7 @@ app.service("api", ["$http", "$q", function($http, $q) {
 	};
 
 	this.Droplet.shutdown = function(id) {
-		return httpRequest("post", "/v2/droplets/" + id + "/actions", {}, { type: "shutdown" });
+		return httpRequest("post", "/v2/droplets/" + id + "/actions", {}, { "type": "shutdown" });
 	};
 
 	this.Droplet.remove = function(id) {
@@ -49,6 +58,18 @@ app.controller("HomeCtrl", ["$scope", "$q", "api", function($scope, $q, api) {
 	$scope.droplets = [];
 	$scope.snapshots = [];
 
+	$scope.initialize = function(api_key) {
+		api.authenticate(api_key);
+
+		$q.all([
+			api.Droplet.query(),
+			api.Snapshot.query()
+		]).then(function(results) {
+			$scope.droplets = results[0].droplets;
+			$scope.snapshots = results[1].snapshots;
+		});
+	};
+
 	$scope.start = function(snapshot_id) {
 	};
 
@@ -57,13 +78,4 @@ app.controller("HomeCtrl", ["$scope", "$q", "api", function($scope, $q, api) {
 			return;
 		}
 	};
-
-	// initialize
-	$q.all([
-		api.Droplet.query(),
-		api.Snapshot.query()
-	]).then(function(results) {
-		$scope.droplets = results[0];
-		$scope.snapshots = results[1];
-	});
 }]);

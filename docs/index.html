@@ -21,6 +21,25 @@
 			<div class="col-sm-8 col-sm-offset-2">
 				<div class="panel panel-default">
 					<div class="panel-heading">
+						<h3 class="panel-title">Authenticate</h3>
+					</div>
+
+					<form class="panel-body form-horizontal" name="authForm">
+						<div class="form-group" ng-class="{'has-error': authForm.api_key.$touched && authForm.api_key.$invalid}">
+							<label class="col-sm-3 control-label">API Key</label>
+							<div class="col-sm-6">
+								<input class="form-control" name="api_key" ng-model="api_key" required></select>
+							</div>
+						</div>
+
+						<div class="text-center">
+							<button type="button" class="btn btn-default" ng-disabled="authForm.$invalid" ng-click="initialize(api_key)">Submit</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
 						<h3 class="panel-title">Manage Server</h3>
 					</div>
 
