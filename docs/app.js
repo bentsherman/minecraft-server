@@ -1,15 +1,15 @@
 "use strict";
 
-var app = angular.module("app", []);
+const app = angular.module("app", []);
 
 app.config(["$compileProvider", function($compileProvider) {
 	$compileProvider.debugInfoEnabled(false);
 }]);
 
 app.service("api", ["$http", "$q", function($http, $q) {
-	var self = this;
+	const self = this;
 
-	var httpRequest = function(method, url, params, data) {
+	const httpRequest = function(method, url, params, data) {
 		return $http({
 			method: method,
 			headers: {
@@ -48,12 +48,22 @@ app.service("api", ["$http", "$q", function($http, $q) {
 		});
 	};
 
-	this.Droplet.shutdown = function(id) {
-		return httpRequest("post", "/v2/droplets/" + id + "/actions", {}, { "type": "shutdown" });
-	};
-
 	this.Droplet.remove = function(id) {
 		return httpRequest("delete", "/v2/droplets/" + id);
+	};
+
+	this.DropletAction = {};
+
+	this.DropletAction.shutdown = function(droplet_id) {
+		return httpRequest("post", "/v2/droplets/" + droplet_id + "/actions", {}, { "type": "shutdown" });
+	};
+
+	this.DropletAction.power_off = function(droplet_id) {
+		return httpRequest("post", "/v2/droplets/" + droplet_id + "/actions", {}, { "type": "power_off" });
+	};
+
+	this.DropletAction.get = function(droplet_id, id) {
+		return httpRequest("get", "/v2/droplets/" + droplet_id + "/actions/" + id);
 	};
 
 	this.Snapshot = {};
@@ -63,32 +73,62 @@ app.service("api", ["$http", "$q", function($http, $q) {
 	};
 }]);
 
-app.controller("HomeCtrl", ["$scope", "$q", "api", function($scope, $q, api) {
+app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeout, api) {
+	$scope.status = "";
 	$scope.droplets = [];
 	$scope.snapshots = [];
 
-	$scope.initialize = function(api_key) {
+	const sleep = function(ms) {
+	  return new Promise(resolve => $timeout(resolve, ms));
+	}
+
+	$scope.initialize = async function(api_key) {
 		api.authenticate(api_key);
 
-		$q.all([
-			api.Droplet.query(),
-			api.Snapshot.query()
-		]).then(function(results) {
-			$scope.droplets = results[0].droplets;
-			$scope.snapshots = results[1].snapshots;
-		});
+		const promise1 = api.Droplet.query();
+		const promise2 = api.Snapshot.query();
+
+		$scope.droplets = (await promise1).droplets;
+		$scope.snapshots = (await promise2).snapshots;
 	};
 
-	$scope.start = function(snapshot_id) {
-		api.Droplet.create(snapshot_id)
-			.then(function() {
-				console.log("Successfully started server.");
-			});
+	$scope.start = async function(snapshot_id) {
+		await api.Droplet.create(snapshot_id);
+
+		$scope.status = "Starting...";
 	};
 
-	$scope.stop = function(droplet_id, snapshot_id) {
+	$scope.stop = async function(droplet_id, snapshot_id) {
 		if ( !confirm("Are you sure you want to stop the Minecraft server?") ) {
 			return;
 		}
+
+		// attempt to shutdown the droplet
+		const result = await api.DropletAction.shutdown(droplet_id);
+		const action_id = result.action.id;
+
+		$scope.status = "Shutting down...";
+
+		while ( true ) {
+			const result = await api.DropletAction.get(droplet_id, action_id);
+			const status = result.action.status;
+
+			if ( status === "completed" ) {
+				break;
+			}
+			else if ( status === "errored" ) {
+				$scope.status = "Error: shutdown failed"
+				break;
+			}
+			else {
+				await sleep(1000);
+			}
+		}
+
+		// attempt to power off the droplet
+
+		// create snapshot of droplet
+
+		// destroy old snapshot and droplet
 	};
 }]);

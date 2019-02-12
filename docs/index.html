@@ -60,6 +60,15 @@
 
 						<hr>
 
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Status</label>
+							<div class="col-sm-6">
+								<p class="form-control-static">{{status}}</p>
+							</div>
+						</div>
+
+						<hr>
+
 						<div class="text-center">
 							<button type="button" class="btn btn-default" ng-disabled="form.$invalid" ng-click="start(snapshot_id)">Start</button>
 							<button type="button" class="btn btn-default" ng-disabled="form.$invalid" ng-click="stop(droplet_id, snapshot_id)">Stop</button>
