@@ -39,6 +39,15 @@ app.service("api", ["$http", "$q", function($http, $q) {
 		return httpRequest("get", "/v2/droplets/" + id);
 	};
 
+	this.Droplet.create = function(snapshot_id) {
+		return httpRequest("post", "/v2/droplets", {}, {
+			"name": "minecraft-server",
+			"region": "nyc3",
+			"size": "s-1vcpu-1gb",
+			"image": snapshot_id
+		});
+	};
+
 	this.Droplet.shutdown = function(id) {
 		return httpRequest("post", "/v2/droplets/" + id + "/actions", {}, { "type": "shutdown" });
 	};
@@ -71,6 +80,10 @@ app.controller("HomeCtrl", ["$scope", "$q", "api", function($scope, $q, api) {
 	};
 
 	$scope.start = function(snapshot_id) {
+		api.Droplet.create(snapshot_id)
+			.then(function() {
+				console.log("Successfully started server.");
+			});
 	};
 
 	$scope.stop = function(droplet_id, snapshot_id) {

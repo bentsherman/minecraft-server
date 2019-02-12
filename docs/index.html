@@ -47,14 +47,14 @@
 						<div class="form-group" ng-class="{'has-error': form.droplet_id.$touched && form.droplet_id.$invalid}">
 							<label class="col-sm-3 control-label">Droplet</label>
 							<div class="col-sm-6">
-								<select class="form-control" name="droplet_id" ng-model="droplet_id" ng-options="d.id as d.name for d in droplets" required></select>
+								<select class="form-control" name="droplet_id" ng-model="droplet_id" ng-options="d.id as d.name for d in droplets"></select>
 							</div>
 						</div>
 
 						<div class="form-group" ng-class="{'has-error': form.snapshot_id.$touched && form.snapshot_id.$invalid}">
 							<label class="col-sm-3 control-label">Snapshot</label>
 							<div class="col-sm-6">
-								<select class="form-control" name="snapshot_id" ng-model="snapshot_id" ng-options="s.id as s.name for s in snapshots" required></select>
+								<select class="form-control" name="snapshot_id" ng-model="snapshot_id" ng-options="s.id as s.name for s in snapshots"></select>
 							</div>
 						</div>
 
