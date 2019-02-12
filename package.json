@@ -10,5 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "pm2": "^2.4.0"
+  },
+  "devDependencies": {
+    "http-server": "^0.11.1"
   }
 }

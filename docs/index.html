@@ -28,7 +28,7 @@
 						<div class="form-group" ng-class="{'has-error': authForm.api_key.$touched && authForm.api_key.$invalid}">
 							<label class="col-sm-3 control-label">API Key</label>
 							<div class="col-sm-6">
-								<input class="form-control" name="api_key" ng-model="api_key" required></select>
+								<input class="form-control" name="api_key" ng-model="api_key" required/>
 							</div>
 						</div>
 
@@ -44,17 +44,21 @@
 					</div>
 
 					<form class="panel-body form-horizontal" name="form">
-						<div class="form-group" ng-class="{'has-error': form.droplet_id.$touched && form.droplet_id.$invalid}">
+						<div class="form-group" ng-class="{'has-error': form.droplet.$touched && form.droplet.$invalid}">
 							<label class="col-sm-3 control-label">Droplet</label>
 							<div class="col-sm-6">
-								<select class="form-control" name="droplet_id" ng-model="droplet_id" ng-options="d.id as d.name for d in droplets"></select>
+								<select class="form-control" name="droplet" ng-model="droplet" ng-options="d as d.name for d in droplets track by d.id">
+									<option value=""></option>
+								</select>
 							</div>
 						</div>
 
-						<div class="form-group" ng-class="{'has-error': form.snapshot_id.$touched && form.snapshot_id.$invalid}">
+						<div class="form-group" ng-class="{'has-error': form.snapshot.$touched && form.snapshot.$invalid}">
 							<label class="col-sm-3 control-label">Snapshot</label>
 							<div class="col-sm-6">
-								<select class="form-control" name="snapshot_id" ng-model="snapshot_id" ng-options="s.id as s.name for s in snapshots"></select>
+								<select class="form-control" name="snapshot" ng-model="snapshot" ng-options="s as s.name for s in snapshots track by s.id">
+									<option value=""></option>
+								</select>
 							</div>
 						</div>
 
@@ -70,8 +74,8 @@
 						<hr>
 
 						<div class="text-center">
-							<button type="button" class="btn btn-default" ng-disabled="form.$invalid" ng-click="start(snapshot_id)">Start</button>
-							<button type="button" class="btn btn-default" ng-disabled="form.$invalid" ng-click="stop(droplet_id, snapshot_id)">Stop</button>
+							<button type="button" class="btn btn-default" ng-disabled="form.$invalid" ng-click="start(snapshot)">Start</button>
+							<button type="button" class="btn btn-default" ng-disabled="form.$invalid" ng-click="stop(droplet)">Stop</button>
 						</div>
 					</form>
 				</div>
