@@ -89,9 +89,10 @@ app.service("api", ["$http", function($http) {
 }]);
 
 app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeout, api) {
+	$scope.server_name = "minecraft-server";
 	$scope.status = "";
-	$scope.droplets = [];
-	$scope.snapshots = [];
+	$scope.droplet = {};
+	$scope.snapshot = {};
 
 	const sleep = function(ms) {
 	  return new Promise(resolve => $timeout(resolve, ms));
@@ -100,11 +101,36 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 	$scope.initialize = async function(api_key) {
 		api.authenticate(api_key);
 
+		// query droplets and snapshots
 		let promise1 = api.Droplet.query();
 		let promise2 = api.Snapshot.query();
 
-		$scope.droplets = (await promise1).droplets;
-		$scope.snapshots = (await promise2).snapshots;
+		// get the first droplet with the server name
+		$scope.droplet = (await promise1)
+			.droplets
+			.find(function(droplet) {
+				return (droplet.name === $scope.server_name);
+			});
+
+		// get the first snapshot with the server name
+		$scope.snapshot = (await promise2)
+			.snapshots
+			.find(function(snapshot) {
+				return (snapshot.name === $scope.server_name);
+			});
+
+		// determine the server status
+		if ( $scope.droplet !== undefined && $scope.droplet.status === "new" ) {
+			$scope.status = "Starting...";
+		}
+		else if ( $scope.droplet !== undefined && $scope.droplet.status === "active" ) {
+			$scope.status = "Running";
+		}
+		else {
+			$scope.status = "Stopped";
+		}
+
+		$scope.$digest();
 	};
 
 	$scope.start = async function(snapshot) {
@@ -116,17 +142,17 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 			});
 
 		// create droplet
-		let result = await api.Droplet.create(snapshot.name, "nyc3", "s-1vcpu-1gb", snapshot.id, keys);
+		let result = await api.Droplet.create(snapshot.name, "nyc3", "s-1vcpu-2gb", snapshot.id, keys);
 		let droplet_id = result.droplet.id;
 
 		$scope.status = "Starting...";
 
 		// wait for droplet creation to complete
 		while ( true ) {
-			let result = await api.Droplet.get(droplet_id);
-			let status = result.droplet.status;
+			let droplet = (await api.Droplet.get(droplet_id)).status;
 
-			if ( status === "active" ) {
+			if ( droplet.status === "active" ) {
+				$scope.droplet = droplet;
 				break;
 			}
 			else {

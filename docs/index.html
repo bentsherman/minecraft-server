@@ -38,32 +38,12 @@
 					</form>
 				</div>
 
-				<div class="panel panel-default">
+				<div class="panel panel-default" ng-show="status != ''">
 					<div class="panel-heading">
 						<h3 class="panel-title">Manage Server</h3>
 					</div>
 
-					<form class="panel-body form-horizontal" name="form">
-						<div class="form-group" ng-class="{'has-error': form.droplet.$touched && form.droplet.$invalid}">
-							<label class="col-sm-3 control-label">Droplet</label>
-							<div class="col-sm-6">
-								<select class="form-control" name="droplet" ng-model="droplet" ng-options="d as d.name for d in droplets track by d.id">
-									<option value=""></option>
-								</select>
-							</div>
-						</div>
-
-						<div class="form-group" ng-class="{'has-error': form.snapshot.$touched && form.snapshot.$invalid}">
-							<label class="col-sm-3 control-label">Snapshot</label>
-							<div class="col-sm-6">
-								<select class="form-control" name="snapshot" ng-model="snapshot" ng-options="s as s.name for s in snapshots track by s.id">
-									<option value=""></option>
-								</select>
-							</div>
-						</div>
-
-						<hr>
-
+					<form class="panel-body form-horizontal">
 						<div class="form-group">
 							<label class="col-sm-3 control-label">Status</label>
 							<div class="col-sm-6">
@@ -71,11 +51,18 @@
 							</div>
 						</div>
 
+						<div class="form-group">
+							<label class="col-sm-3 control-label">IP Address</label>
+							<div class="col-sm-6">
+								<p class="form-control-static">{{droplet.networks.v4[0].ip_address}}</p>
+							</div>
+						</div>
+
 						<hr>
 
 						<div class="text-center">
-							<button type="button" class="btn btn-default" ng-disabled="form.$invalid" ng-click="start(snapshot)">Start</button>
-							<button type="button" class="btn btn-default" ng-disabled="form.$invalid" ng-click="stop(droplet)">Stop</button>
+							<button type="button" class="btn btn-default" ng-disabled="status === 'Running'" ng-click="start(snapshot)">Start</button>
+							<button type="button" class="btn btn-default" ng-disabled="status === 'Stopped'" ng-click="stop(droplet)">Stop</button>
 						</div>
 					</form>
 				</div>
