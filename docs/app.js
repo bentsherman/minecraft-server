@@ -39,12 +39,13 @@ app.service("api", ["$http", function($http) {
 		return httpRequest("get", "/v2/droplets/" + id);
 	};
 
-	this.Droplet.create = function(name, region, size, snapshot_id) {
+	this.Droplet.create = function(name, region, size, image, ssh_keys) {
 		return httpRequest("post", "/v2/droplets", {}, {
 			"name": name,
 			"region": region,
 			"size": size,
-			"image": snapshot_id
+			"image": image,
+			"ssh_keys": ssh_keys
 		});
 	};
 
@@ -79,6 +80,12 @@ app.service("api", ["$http", function($http) {
 	this.Snapshot.delete = function(id) {
 		return httpRequest("delete", "/v2/snapshots/" + id);
 	};
+
+	this.Key = {};
+
+	this.Key.query = function() {
+		return httpRequest("get", "/v2/account/keys");
+	};
 }]);
 
 app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeout, api) {
@@ -101,8 +108,15 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 	};
 
 	$scope.start = async function(snapshot) {
+		// query SSH keys
+		let keys = (await api.Key.query())
+			.ssh_keys
+			.map(function(key) {
+				return key.id;
+			});
+
 		// create droplet
-		let result = await api.Droplet.create(snapshot.name, "nyc3", "s-1vcpu-1gb", snapshot.id);
+		let result = await api.Droplet.create(snapshot.name, "nyc3", "s-1vcpu-1gb", snapshot.id, keys);
 		let droplet_id = result.droplet.id;
 
 		$scope.status = "Starting...";
