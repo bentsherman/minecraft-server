@@ -149,7 +149,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 
 		// wait for droplet creation to complete
 		while ( true ) {
-			let droplet = (await api.Droplet.get(droplet_id)).status;
+			let droplet = (await api.Droplet.get(droplet_id));
 
 			if ( droplet.status === "active" ) {
 				$scope.droplet = droplet;
