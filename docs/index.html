@@ -39,7 +39,7 @@
 					</form>
 				</div>
 
-				<div class="panel panel-default" ng-show="status != ''">
+				<div class="panel panel-default" ng-show="status !== -1">
 					<div class="panel-heading">
 						<h3 class="panel-title">Manage Server</h3>
 					</div>
@@ -48,7 +48,9 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">Status</label>
 							<div class="col-sm-6">
-								<p class="form-control-static">{{status}}</p>
+								<p class="form-control-static text-{{STATUS_COLORS[status]}}">
+									<strong>{{STATUS_NAMES[status]}}</strong>
+								</p>
 							</div>
 						</div>
 
@@ -62,8 +64,8 @@
 						<hr>
 
 						<div class="text-center">
-							<button type="button" class="btn btn-default" ng-disabled="status !== 'Stopped'" ng-click="start(snapshot)">Start</button>
-							<button type="button" class="btn btn-default" ng-disabled="status !== 'Running'" ng-click="stop(droplet)">Stop</button>
+							<button type="button" class="btn btn-default" ng-disabled="status !== STATUS_STOPPED" ng-click="start(snapshot)">Start</button>
+							<button type="button" class="btn btn-default" ng-disabled="status !== STATUS_RUNNING" ng-click="stop(droplet)">Stop</button>
 						</div>
 					</form>
 				</div>

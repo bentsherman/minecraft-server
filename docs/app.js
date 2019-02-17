@@ -89,8 +89,38 @@ app.service("api", ["$http", function($http) {
 }]);
 
 app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeout, api) {
+	const STATUS_STOPPED = 0;
+	const STATUS_STARTING = 1;
+	const STATUS_RUNNING = 2;
+	const STATUS_SHUTDOWN = 3;
+	const STATUS_SNAPSHOT = 4;
+	const STATUS_CLEANUP = 5;
+
+	$scope.STATUS_STOPPED = STATUS_STOPPED;
+	$scope.STATUS_STARTING = STATUS_STARTING;
+	$scope.STATUS_RUNNING = STATUS_RUNNING;
+	$scope.STATUS_SHUTDOWN = STATUS_SHUTDOWN;
+	$scope.STATUS_SNAPSHOT = STATUS_SNAPSHOT;
+	$scope.STATUS_CLEANUP = STATUS_CLEANUP;
+
+	$scope.STATUS_NAMES = {};
+	$scope.STATUS_NAMES[STATUS_STOPPED] = "Stopped";
+	$scope.STATUS_NAMES[STATUS_STARTING] = "Starting...";
+	$scope.STATUS_NAMES[STATUS_RUNNING] = "Running";
+	$scope.STATUS_NAMES[STATUS_SHUTDOWN] = "Shutting down...";
+	$scope.STATUS_NAMES[STATUS_SNAPSHOT] = "Creating snapshot...";
+	$scope.STATUS_NAMES[STATUS_CLEANUP] = "Cleaning up...";
+
+	$scope.STATUS_COLORS = {};
+	$scope.STATUS_COLORS[STATUS_STOPPED] = "success";
+	$scope.STATUS_COLORS[STATUS_STARTING] = "warning";
+	$scope.STATUS_COLORS[STATUS_RUNNING] = "success";
+	$scope.STATUS_COLORS[STATUS_SHUTDOWN] = "warning";
+	$scope.STATUS_COLORS[STATUS_SNAPSHOT] = "warning";
+	$scope.STATUS_COLORS[STATUS_CLEANUP] = "warning";
+
 	$scope.server_name = "minecraft-server";
-	$scope.status = "";
+	$scope.status = -1;
 	$scope.droplet = {};
 	$scope.snapshot = {};
 
@@ -121,13 +151,13 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 
 		// determine the server status
 		if ( $scope.droplet !== undefined && $scope.droplet.status === "new" ) {
-			$scope.status = "Starting...";
+			$scope.status = STATUS_STARTING;
 		}
 		else if ( $scope.droplet !== undefined && $scope.droplet.status === "active" ) {
-			$scope.status = "Running";
+			$scope.status = STATUS_RUNNING;
 		}
 		else {
-			$scope.status = "Stopped";
+			$scope.status = STATUS_STOPPED;
 		}
 
 		$scope.$digest();
@@ -145,7 +175,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 		let result = await api.Droplet.create(snapshot.name, "nyc3", "s-1vcpu-2gb", snapshot.id, keys);
 		let droplet_id = result.droplet.id;
 
-		$scope.status = "Starting...";
+		$scope.status = STATUS_STARTING;
 
 		// wait for droplet creation to complete
 		while ( true ) {
@@ -160,7 +190,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 			}
 		}
 
-		$scope.status = "Running";
+		$scope.status = STATUS_RUNNING;
 		$scope.$digest();
 	};
 
@@ -170,7 +200,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 		}
 
 		// attempt to shutdown the droplet
-		$scope.status = "Shutting down...";
+		$scope.status = STATUS_SHUTDOWN;
 
 		let shutdownResult = await api.DropletAction.shutdown(droplet.id);
 
@@ -188,7 +218,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 		}
 
 		// create snapshot of droplet
-		$scope.status = "Creating snapshot...";
+		$scope.status = STATUS_SNAPSHOT;
 
 		let snapshotResult = await api.DropletAction.snapshot(droplet.id, droplet.name);
 		let action_id = snapshotResult.action.id;
@@ -212,7 +242,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 		}
 
 		// destroy droplet and old snapshot
-		$scope.status = "Cleaning up...";
+		$scope.status = STATUS_CLEANUP;
 
 		let promise1 = api.Droplet.delete(droplet.id);
 		let promise2 = api.Snapshot.delete(droplet.image.id);
@@ -221,7 +251,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 			await promise1;
 			await promise2;
 
-			$scope.status = "Stopped";
+			$scope.status = STATUS_STOPPED;
 			$scope.$digest();
 		}
 		catch ( err ) {
