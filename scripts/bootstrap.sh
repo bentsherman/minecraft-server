@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# parse command-line arguments
+VERSION="$1"
+WORLD_URL="$2"
+
+if [[ -z $VERSION ]]; then
+	VERSION="1.13.2"
+fi
+
 # TODO: create non-root user
 
 # install package dependencies
@@ -12,11 +20,16 @@ git clone https://github.com/bentsherman/minecraft-server.git
 # download minecraft server jar
 cd minecraft-server
 
-./scripts/download.sh 1.13.2
+./scripts/download.sh $VERSION
 
 echo "eula=true" > eula.txt
 
-# TODO: download existing minecraft world
+# download existing minecraft world
+if [[ ! -z $WORLD_URL ]]; then
+	wget -O world.zip $WORLD_URL
+	unzip world.zip
+	rm -rf world.zip
+fi
 
 # start minecraft server
 npm start
