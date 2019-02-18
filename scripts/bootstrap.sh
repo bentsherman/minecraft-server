@@ -8,11 +8,22 @@ if [[ -z $VERSION ]]; then
 	VERSION="1.13.2"
 fi
 
-# TODO: create non-root user
+# determine operating system
+OS="$(awk -F= '/^NAME/{print $2}' /etc/os-release)"
 
 # install package dependencies
-sudo apt install default-jre git npm unzip
-sudo npm install -g pm2
+if [[ $OS == "\"Ubuntu\"" ]]; then
+	sudo apt update
+	sudo apt install -y default-jre git npm unzip
+	sudo npm install -g pm2
+elif [[ $OS == "\"CentOS Linux\"" ]]; then
+	sudo yum install epel-release
+	sudo yum install -y default-jre git npm unzip
+	sudo npm install -g pm2
+else
+	echo "error: $OS is not supported"
+	exit -1
+fi
 
 # install this repository
 git clone https://github.com/bentsherman/minecraft-server.git
