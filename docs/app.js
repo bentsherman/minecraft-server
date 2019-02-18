@@ -128,7 +128,7 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 	  return new Promise(resolve => $timeout(resolve, ms));
 	}
 
-	$scope.initialize = async function(api_key) {
+	$scope.initialize = async function(api_key, server_name) {
 		api.authenticate(api_key);
 
 		// query droplets and snapshots
@@ -139,14 +139,14 @@ app.controller("HomeCtrl", ["$scope", "$timeout", "api", function($scope, $timeo
 		$scope.droplet = (await promise1)
 			.droplets
 			.find(function(droplet) {
-				return (droplet.name === $scope.server_name);
+				return (droplet.name === server_name);
 			});
 
 		// get the first snapshot with the server name
 		$scope.snapshot = (await promise2)
 			.snapshots
 			.find(function(snapshot) {
-				return (snapshot.name === $scope.server_name);
+				return (snapshot.name === server_name);
 			});
 
 		// determine the server status

@@ -22,7 +22,7 @@
 			<div class="col-sm-8 col-sm-offset-2">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h3 class="panel-title">Authenticate</h3>
+						<h3 class="panel-title">Initialize</h3>
 					</div>
 
 					<form class="panel-body form-horizontal" name="authForm">
@@ -33,8 +33,15 @@
 							</div>
 						</div>
 
+						<div class="form-group" ng-class="{'has-error': authForm.server_name.$touched && authForm.server_name.$invalid}">
+							<label class="col-sm-3 control-label">Server Name</label>
+							<div class="col-sm-6">
+								<input class="form-control" name="server_name" ng-model="server_name" required/>
+							</div>
+						</div>
+
 						<div class="text-center">
-							<button type="button" class="btn btn-default" ng-disabled="authForm.$invalid" ng-click="initialize(api_key)">Submit</button>
+							<button type="button" class="btn btn-default" ng-disabled="authForm.$invalid" ng-click="initialize(api_key, server_name)">Submit</button>
 						</div>
 					</form>
 				</div>
